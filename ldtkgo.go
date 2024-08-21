@@ -66,7 +66,7 @@ func (p *Property) AsArray() []interface{} {
 }
 
 // AsMap returns a property's value as a map of string to interface{} values. As an aside, the JSON deserialization process turns LDtk Points into Maps, where the key is "cx" or
-// "cy", and the value is the x and y position. Note that this function doesn't check to ensure the value is the specified type before returning it.
+// "cy", and the value is the x and y position as float64s. Note that this function doesn't check to ensure the value is the specified type before returning it.
 func (p *Property) AsMap() map[string]interface{} {
 	return p.Value.(map[string]interface{})
 }
