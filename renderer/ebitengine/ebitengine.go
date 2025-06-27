@@ -74,6 +74,7 @@ func New(fs fs.FS, project *ldtkgo.Project) (*Renderer, error) {
 }
 
 type DrawOptions struct {
+	Scale                 float64                                                          // The "zoom level" to use when rendering. If no value is passed in, 1.0 is used.
 	BackgroundColorFill   bool                                                             // Whether to fill the screen with the background color or not
 	BackgroundDraw        bool                                                             // Whether to render the background image when drawing the ldtkgo.Level
 	BackgroundDrawOptions *ebiten.DrawImageOptions                                         // The options to use when drawing the background
@@ -105,6 +106,10 @@ func (r *Renderer) Render(level *ldtkgo.Level, screen *ebiten.Image, drawOptions
 
 	if drawOptions.BackgroundColorFill {
 		screen.Fill(level.BGColor) // We want to use the BG Color when possible
+	}
+
+	if drawOptions.Scale == 0 {
+		drawOptions.Scale = 1.0 // Default scale is 1.0
 	}
 
 	if drawOptions.BackgroundDraw && level.BGImage != nil && level.BGImage.Path != "" {
@@ -182,7 +187,7 @@ func (r *Renderer) drawTile(tileData *ldtkgo.Tile, tileIndex int, layer *ldtkgo.
 
 	// Move tile to final position; note that slightly unlike LDtk, layer offsets in LDtk-Go are added directly into the final tiles' X and Y positions. This means that with this renderer,
 	// if a layer's offset pushes tiles outside of the layer's render Result image, they will be cut off. On LDtk, the tiles are still rendered, of course.
-	opt.GeoM.Translate(float64(tileData.Position[0]+layer.OffsetX), float64(tileData.Position[1]+layer.OffsetY))
+	opt.GeoM.Translate(float64(tileData.Position[0]+layer.OffsetX)*drawOptions.Scale, float64(tileData.Position[1]+layer.OffsetY)*drawOptions.Scale)
 
 	// Finally, draw the tile to the Result image.
 	screen.DrawImage(tile, &opt)
